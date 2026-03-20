@@ -92,7 +92,7 @@ def cfg() -> Settings:
         MAX_FILE_MB             = int(os.getenv("MAX_FILE_MB",         "10")),
         IMAGE_WEIGHT            = float(os.getenv("IMAGE_WEIGHT",      "0.6")),
         TEXT_WEIGHT             = float(os.getenv("TEXT_WEIGHT",       "0.4")),
-        MIN_MATCH_SCORE         = float(os.getenv("MIN_MATCH_SCORE",   "25.0")),
+        MIN_MATCH_SCORE         = float(os.getenv("MIN_MATCH_SCORE",   "35.0")),
         SMTP_HOST               = os.getenv("SMTP_HOST",               ""),
         SMTP_PORT               = int(os.getenv("SMTP_PORT",           "587")),
         SMTP_USER               = os.getenv("SMTP_USER",               ""),
