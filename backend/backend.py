@@ -70,11 +70,11 @@ class Settings(BaseModel):
     IMAGE_WEIGHT:           float = 0.6
     TEXT_WEIGHT:            float = 0.4
     MIN_MATCH_SCORE:        float = 35.0
-    SMTP_HOST:                str = ""
+    SMTP_HOST:                str = "smtp.gmail.com"
     SMTP_PORT:                int = 587
-    SMTP_USER:                str = ""
-    SMTP_PASSWORD:            str = ""
-    SMTP_FROM:                str = ""
+    SMTP_USER:                str = "findmeproject109@gmail.com"
+    SMTP_PASSWORD:            str = "sbbq icnl ivwk iflj"
+    SMTP_FROM:                str = "FINDME <findmeproject109@gmail.com>"
     TWILIO_ACCOUNT_SID:       str = ""
     TWILIO_AUTH_TOKEN:        str = ""
     TWILIO_FROM_NUMBER:       str = ""
@@ -83,8 +83,9 @@ class Settings(BaseModel):
 def cfg() -> Settings:
     from dotenv import load_dotenv
     load_dotenv()
+    # mongodb+srv://r230316_db_user:uMUXHvxUpFv4Y30x@cluster0.64dqxw7.mongodb.net/
     return Settings(
-        MONGO_URI               = os.getenv("MONGO_URI",               "mongodb+srv://r230316_db_user:uMUXHvxUpFv4Y30x@cluster0.64dqxw7.mongodb.net/"),
+        MONGO_URI               = os.getenv("MONGO_URI",               "mongodb://localhost:27017"),
         MONGO_DB                = os.getenv("MONGO_DB",                "findme"),
         SECRET_KEY              = os.getenv("SECRET_KEY",              "changeme"),
         ACCESS_TOKEN_EXPIRE_MINS= int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")),
@@ -93,11 +94,11 @@ def cfg() -> Settings:
         IMAGE_WEIGHT            = float(os.getenv("IMAGE_WEIGHT",      "0.6")),
         TEXT_WEIGHT             = float(os.getenv("TEXT_WEIGHT",       "0.4")),
         MIN_MATCH_SCORE         = float(os.getenv("MIN_MATCH_SCORE",   "35.0")),
-        SMTP_HOST               = os.getenv("SMTP_HOST",               ""),
+        SMTP_HOST               = os.getenv("SMTP_HOST",               "smtp.gmail.com"),
         SMTP_PORT               = int(os.getenv("SMTP_PORT",           "587")),
-        SMTP_USER               = os.getenv("SMTP_USER",               ""),
-        SMTP_PASSWORD           = os.getenv("SMTP_PASSWORD",           ""),
-        SMTP_FROM               = os.getenv("SMTP_FROM",               ""),
+        SMTP_USER               = os.getenv("SMTP_USER",               "findmeproject109@gmail.com"),
+        SMTP_PASSWORD           = os.getenv("SMTP_PASSWORD",           "sbbq icnl ivwk iflj"),
+        SMTP_FROM               = os.getenv("SMTP_FROM",               "FINDME <findmeproject109@gmail.com>"),
         TWILIO_ACCOUNT_SID      = os.getenv("TWILIO_ACCOUNT_SID",      ""),
         TWILIO_AUTH_TOKEN       = os.getenv("TWILIO_AUTH_TOKEN",       ""),
         TWILIO_FROM_NUMBER      = os.getenv("TWILIO_FROM_NUMBER",      ""),
