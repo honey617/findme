@@ -1,3 +1,4 @@
+pip install --upgrade pip
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 motor==3.5.1                    # async MongoDB driver
@@ -9,7 +10,7 @@ python-multipart==0.0.12
 pillow==10.4.0                  # image processing
 numpy==1.26.4
 scikit-learn==1.5.2             # TF-IDF + cosine similarity
-torch==2.9.0             # CNN backbone (torchvision MobileNetV3)
-torchvision==0.24.1
+torch==2.3.1             # CNN backbone (torchvision MobileNetV3)
+torchvision==0.18.1
 python-dotenv==1.0.1
 aiofiles==24.1.0
