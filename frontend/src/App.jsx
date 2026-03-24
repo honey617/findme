@@ -360,8 +360,8 @@ function Navbar({page,setPage}){
   const [showSignOut,setShowSignOut]=useState(false);
   const doLogout=()=>{logout();setShowSignOut(false);setPage("board");};
   const links=user
-    ?[["board","🏠 Browse"],["post","📤 Post"],["matches","🔗 Matches"],["mine","📋 Mine"],["leaderboard","🏆"],["experiences","✨ Stories"],["notifs","🔔"]]
-    :[["board","🏠 Browse"],["post","📤 Post"],["leaderboard","🏆"],["experiences","✨ Stories"]];
+    ?[["board","🏠 Browse"],["post","📤 Post"],["matches","🔗 Matches"],["mine","📋 Mine"],["leaderboard","🏆"],["experiences","✨ Stories"],["howto","📖 Guide"],["notifs","🔔"]]
+    :[["board","🏠 Browse"],["post","📤 Post"],["leaderboard","🏆"],["experiences","✨ Stories"],["howto","📖 Guide"]];
   return(
     <>
     <nav style={{position:"sticky",top:0,zIndex:500,background:"rgba(8,8,24,.92)",backdropFilter:"blur(20px)",borderBottom:`2px solid ${P.border}`}}>
@@ -1184,11 +1184,181 @@ const Guard=()=>(<div style={{textAlign:"center",padding:"80px 24px"}}><div styl
 const Empty=({icon,title,sub})=>(<div style={{textAlign:"center",padding:"72px 24px"}}><div style={{fontSize:58,marginBottom:14,animation:"float 3s ease-in-out infinite"}}>{icon}</div><GT g={P.gMain} tag="div" style={{fontFamily:"'Syne',sans-serif",fontSize:24,fontWeight:900,marginBottom:8,display:"block"}}>{title}</GT><div style={{fontSize:13,color:P.ink3}}>{sub}</div></div>);
 const CLoad=()=><div style={{display:"flex",justifyContent:"center",padding:80}}><Spin s={48}/></div>;
 
+// ── HOW TO USE PAGE ────────────────────────────────────────────────────────────
+function HowToUsePage({setPage}){
+  const [activeScenario,setActiveScenario]=useState(null);
+  const [openFaq,setOpenFaq]=useState(null);
+
+  const scenarios=[
+    {
+      id:"lost", icon:"🔍", g:P.gCoral, color:P.coral,
+      title:"I Lost Something", subtitle:"Steps to get your item back",
+      steps:[
+        {n:"1",icon:"🚀",title:"Create Your Account",desc:"Click Join Free top right. Enter your name, email, password and phone number. Your phone is shared only with your matched finder — not publicly visible.",tip:"Use your college email for credibility with other students."},
+        {n:"2",icon:"📋",title:"Post Your Lost Item",desc:'Click "📤 Post" → select "🔍 I Lost Something". Fill the item name, category, and location where you last saw it. Add tags like color, brand, or any unique marks.',tip:"The more details you add, the better the matching accuracy."},
+        {n:"3",icon:"📷",title:"Upload a Photo",desc:"Upload a photo of the item from your camera roll or even a Google image of the same product. The system visually compares photos to find matches.",tip:"Even a product stock photo helps the matching engine."},
+        {n:"4",icon:"👁️",title:"Review & Confirm",desc:'Click "Review & Confirm". A preview card shows everything you entered. Check the details carefully. Click "Confirm & Post" when satisfied.',tip:"Double check the location — it helps matching a lot."},
+        {n:"5",icon:"🔗",title:"Run Find Matches",desc:'Open your item from the Browse page, then click "Find Matches". The system compares your item against all found items and shows results with a match percentage.',tip:"Results as low as 20% are shown. Even a 30% match is worth checking via chat."},
+        {n:"6",icon:"💬",title:"Chat with the Finder",desc:"Each match result shows a 💬 Chat button. Click it to open an inline chat. Introduce yourself and describe a unique detail only you would know to verify it is yours.",tip:"Ask the finder about a specific scratch, sticker, or code on the item."},
+        {n:"7",icon:"🔔",title:"Wait for Auto Notifications",desc:"Even without a match now, your listing stays active. When someone posts a new found item matching yours, you get instant email and SMS automatically.",tip:"Keep the item posted — new found items are added every day."},
+        {n:"8",icon:"✅",title:"Confirm the Outcome",desc:'Once you have your item back, go to "🔗 Matches" → "Update Outcome" → "🎉 Yes! Got it back". This marks it claimed and gives the finder leaderboard credit.',tip:"Always close matches after resolution — it keeps the board accurate."},
+      ],
+    },
+    {
+      id:"found", icon:"📦", g:P.gCyan, color:P.cyan,
+      title:"I Found Something", subtitle:"Steps to return the item to its owner",
+      steps:[
+        {n:"1",icon:"🚀",title:"Create Your Account",desc:"Click Join Free. Sign up with name, email, password and phone. Your contact is shared with the item owner when a match is confirmed so they can reach you for pickup.",tip:"A complete profile builds trust with the person who lost their item."},
+        {n:"2",icon:"📋",title:"Post the Found Item",desc:'Click "📤 Post" → select "📦 I Found Something". Enter the item name, category, and exact location where you found it. Be as specific as possible with tags.',tip:"'Library 2nd floor near the printer' is better than just 'Library'."},
+        {n:"3",icon:"📷",title:"Take a Clear Photo",desc:"Photograph the found item and upload it. This is the most powerful part — the system visually compares your photo against all posted lost item photos on campus.",tip:"Good lighting and a plain background makes visual matching more accurate."},
+        {n:"4",icon:"⚡",title:"Matching Runs Automatically",desc:"The moment you post, the system scans all active lost items and compares them. If a strong match is found, the owner gets an email and SMS immediately — no action needed from you.",tip:"This runs in the background automatically after every post."},
+        {n:"5",icon:"🔗",title:"Check Your Matches Tab",desc:'Go to "🔗 Matches" → click the "📦 I Found Something" tab. See all matches for your found items. Each card shows the matched lost item and the owner contact details.',tip:"Check this tab a few minutes after posting — you may already have a match."},
+        {n:"6",icon:"💬",title:"Chat with the Owner",desc:"Click 💬 Chat on any match to message the lost item owner. Let them know your availability. Ask them to describe a unique detail to verify the item is truly theirs.",tip:"Ask for something not visible in any photo — a code, inscription, or specific damage."},
+        {n:"7",icon:"🏆",title:"Earn Leaderboard Credit",desc:"Once the owner confirms receipt, your leaderboard score goes up by 1. Top returners get gold, silver, and bronze badges displayed publicly on campus.",tip:"The more items you return, the higher your campus reputation!"},
+      ],
+    },
+  ];
+
+  const faqs=[
+    {q:"What if no match is found right now?",a:"Your item stays active. Whenever a new found item is posted that matches yours, you automatically get email and SMS. Check back daily — new items are added regularly."},
+    {q:"Is my phone number visible to everyone?",a:"No. Your phone is only shared with the specific matched person after a match is confirmed. The general public cannot see it at all."},
+    {q:"What if the match percentage is low, like 25%?",a:"Still worth checking! A 25% match could still be your item — especially if the finder did not add a photo or good description. Use chat to ask them directly."},
+    {q:"Can I post multiple lost items?",a:"Yes! Post as many as you need. All items appear in 📋 My Items where you can edit, update or delete them anytime."},
+    {q:"How do I verify the person claiming my item is genuine?",a:"Ask them to describe a unique feature not visible in any photo — a specific scratch, a handwritten note inside, or a serial number. A genuine owner will know it immediately."},
+    {q:"What happens after I confirm the match?",a:"Both items are marked as Claimed and removed from active listings. The finder gets +1 leaderboard credit. The match stays in your history for reference."},
+    {q:"What if the founder never responds?",a:"Try their contact details visible in the match card — call or email directly. If no response after a week, hand the item to your campus lost and found office."},
+    {q:"Can I edit my item after posting?",a:"Yes. Go to 📋 My Items, click Edit on any item to update its name, description, location, tags, or status anytime."},
+  ];
+
+  return(
+    <div style={{maxWidth:900,margin:"0 auto",padding:"28px 20px"}}>
+      {/* Page header */}
+      <div style={{textAlign:"center",marginBottom:40,animation:"fadeUp .4s ease"}}>
+        <div style={{width:72,height:72,borderRadius:22,background:P.gHero,margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,boxShadow:P.shLg}}>📖</div>
+        <GT g={P.gHero} tag="h1" style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(26px,5vw,40px)",fontWeight:900,display:"block",marginBottom:10}}>How to Use FINDME</GT>
+        <p style={{color:P.ink3,fontSize:14,maxWidth:500,margin:"0 auto",lineHeight:1.7}}>
+          Everything you need to know to find a lost item or help return one. Pick your situation below.
+        </p>
+      </div>
+
+      {/* Scenario cards */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:32}}>
+        {scenarios.map(s=>(
+          <button key={s.id} onClick={()=>setActiveScenario(activeScenario===s.id?null:s.id)}
+            style={{padding:"24px 20px",borderRadius:20,border:`2.5px solid ${activeScenario===s.id?s.color:P.border}`,background:activeScenario===s.id?s.g:P.card,color:activeScenario===s.id?"#fff":P.ink,cursor:"pointer",fontFamily:"inherit",transition:"all .2s",boxShadow:activeScenario===s.id?`0 8px 32px ${s.color}44`:P.sh,textAlign:"left"}}>
+            <div style={{fontSize:36,marginBottom:10}}>{s.icon}</div>
+            <div style={{fontFamily:"'Syne',sans-serif",fontSize:18,fontWeight:900,marginBottom:4}}>{s.title}</div>
+            <div style={{fontSize:12,opacity:.8,lineHeight:1.5}}>{s.subtitle}</div>
+            <div style={{marginTop:12,fontSize:11,fontWeight:800,letterSpacing:".06em",opacity:.75}}>{activeScenario===s.id?"▲ HIDE STEPS":"▼ SHOW STEPS"}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Steps accordion */}
+      {scenarios.map(s=>activeScenario===s.id&&(
+        <div key={s.id} style={{marginBottom:40,animation:"fadeUp .35s ease"}}>
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:22}}>
+            <div style={{width:42,height:42,borderRadius:14,background:s.g,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,boxShadow:`0 4px 14px ${s.color}44`}}>{s.icon}</div>
+            <GT g={s.g} tag="h2" style={{fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:900}}>Step-by-step: {s.title}</GT>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:12}}>
+            {s.steps.map((step,i)=>(
+              <div key={i} style={{background:P.card,border:`2px solid ${P.border}`,borderRadius:18,padding:"18px 20px",display:"flex",gap:14,alignItems:"flex-start",animation:"fadeUp .4s ease",animationDelay:`${i*.05}s`,animationFillMode:"both"}}>
+                <div style={{width:42,height:42,borderRadius:"50%",background:s.g,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:`0 4px 12px ${s.color}44`}}>
+                  <span style={{fontFamily:"'Syne',sans-serif",fontSize:15,fontWeight:900,color:"#fff"}}>{step.n}</span>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:6}}>
+                    <span style={{fontSize:17}}>{step.icon}</span>
+                    <GT g={s.g} style={{fontFamily:"'Syne',sans-serif",fontSize:14,fontWeight:900}}>{step.title}</GT>
+                  </div>
+                  <p style={{fontSize:13,color:P.ink2,lineHeight:1.75,marginBottom:9}}>{step.desc}</p>
+                  <div style={{background:s.color+"12",border:`1.5px solid ${s.color}33`,borderRadius:10,padding:"7px 12px",display:"flex",gap:7,alignItems:"flex-start"}}>
+                    <span style={{fontSize:13,flexShrink:0}}>💡</span>
+                    <span style={{fontSize:12,color:s.color,fontWeight:700,lineHeight:1.6}}>{step.tip}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:22,textAlign:"center"}}>
+            <Btn g={s.g} sz="lg" onClick={()=>setPage("post")} icon={s.icon}>
+              {s.id==="lost"?"Post My Lost Item":"Post Found Item"}
+            </Btn>
+          </div>
+        </div>
+      ))}
+
+      {/* Feature overview */}
+      <div style={{marginBottom:40}}>
+        <div style={{fontSize:11,fontWeight:800,color:P.ink3,letterSpacing:".1em",textAlign:"center",marginBottom:20}}>PLATFORM FEATURES AT A GLANCE</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(195px,1fr))",gap:12}}>
+          {[
+            {icon:"🧠",title:"Smart Matching",desc:"Visual photo + text analysis automatically finds the best matches",color:P.violet},
+            {icon:"🔔",title:"Auto Notifications",desc:"Instant email & SMS when a match is found for your item",color:P.cyan},
+            {icon:"💬",title:"In-App Chat",desc:"Message finder or owner directly within the platform",color:P.pink},
+            {icon:"🏆",title:"Leaderboard",desc:"Top item returners earn public recognition on campus",color:P.amber},
+            {icon:"✨",title:"Stories Wall",desc:"Share your experience and inspire other students",color:P.lime},
+            {icon:"🔍",title:"Find Matches",desc:"Manual search showing all results from 20% match and above",color:P.coral},
+            {icon:"📋",title:"Update Outcome",desc:"Close matches and reward the finder after collecting your item",color:P.cyan},
+            {icon:"🔑",title:"Forgot Password",desc:"Reset password via 6-digit code sent to your email",color:P.violet},
+          ].map(f=>(
+            <div key={f.title} style={{background:P.card,border:`2px solid ${P.border}`,borderRadius:16,padding:"15px 14px",boxShadow:P.sh}}>
+              <div style={{width:38,height:38,borderRadius:11,background:f.color+"20",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,marginBottom:9,border:`1.5px solid ${f.color}33`}}>{f.icon}</div>
+              <div style={{fontWeight:800,fontSize:13,color:P.ink,marginBottom:3}}>{f.title}</div>
+              <div style={{fontSize:11,color:P.ink3,lineHeight:1.6}}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div style={{marginBottom:40}}>
+        <div style={{textAlign:"center",marginBottom:22}}>
+          <GT g={P.gMain} tag="h2" style={{fontFamily:"'Syne',sans-serif",fontSize:22,fontWeight:900,display:"block",marginBottom:5}}>Frequently Asked Questions</GT>
+          <p style={{color:P.ink3,fontSize:13}}>Common questions from campus students</p>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:9}}>
+          {faqs.map((f,i)=>(
+            <div key={i} style={{background:P.card,border:`2px solid ${openFaq===i?P.violet:P.border}`,borderRadius:15,overflow:"hidden",transition:"border .2s",boxShadow:openFaq===i?P.shLg:P.sh}}>
+              <button onClick={()=>setOpenFaq(openFaq===i?null:i)}
+                style={{width:"100%",padding:"15px 18px",background:"none",border:"none",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit",gap:12,textAlign:"left"}}>
+                <span style={{fontWeight:800,fontSize:13,color:openFaq===i?P.violet:P.ink,flex:1,lineHeight:1.4}}>{f.q}</span>
+                <span style={{fontSize:18,color:openFaq===i?P.violet:P.ink3,flexShrink:0,transition:"transform .2s",transform:openFaq===i?"rotate(45deg)":"none",display:"inline-block"}}>＋</span>
+              </button>
+              {openFaq===i&&(
+                <div style={{padding:"0 18px 14px",animation:"fadeUp .2s ease"}}>
+                  <p style={{fontSize:13,color:P.ink2,lineHeight:1.75,borderTop:`1.5px solid ${P.border}`,paddingTop:12}}>{f.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Final CTA */}
+      <div style={{background:P.gHero,borderRadius:22,padding:"36px 28px",textAlign:"center",position:"relative",overflow:"hidden",marginBottom:10}}>
+        <div style={{position:"absolute",top:-40,right:-40,width:180,height:180,borderRadius:"50%",background:"rgba(255,255,255,.08)"}}/>
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{fontSize:42,marginBottom:12}}>🎒</div>
+          <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:24,fontWeight:900,color:"#fff",marginBottom:8}}>Ready to get started?</h2>
+          <p style={{color:"rgba(255,255,255,.85)",fontSize:14,marginBottom:24,lineHeight:1.65}}>Join your campus community on FINDME — free, fast, and easy.</p>
+          <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+            <Btn g="linear-gradient(135deg,rgba(255,255,255,.95),rgba(240,236,255,.95))" col={P.violet} sz="lg" onClick={()=>setPage("register")} icon="🚀">Create Free Account</Btn>
+            <Btn g="rgba(255,255,255,.18)" col="#fff" sz="lg" onClick={()=>setPage("board")} sx={{border:"2px solid rgba(255,255,255,.4)"}}>Browse Items</Btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 // ── ROOT ───────────────────────────────────────────────────────────────────────
 export default function App(){
   const [page,setPage]=useState("board");
   const {ts,toast,remove}=useToast();
-  const PAGES={board:BoardPage,post:PostPage,login:LoginPage,register:RegisterPage,forgot:ForgotPage,profile:ProfilePage,matches:MatchesPage,mine:MyItemsPage,leaderboard:LeaderboardPage,experiences:ExperiencesPage,notifs:NotifsPage};
+  const PAGES={board:BoardPage,post:PostPage,login:LoginPage,register:RegisterPage,forgot:ForgotPage,profile:ProfilePage,matches:MatchesPage,mine:MyItemsPage,leaderboard:LeaderboardPage,experiences:ExperiencesPage,howto:HowToUsePage,notifs:NotifsPage};
   const Page=PAGES[page]||BoardPage;
   return(
     <AuthProvider>
@@ -1210,7 +1380,7 @@ export default function App(){
         <main><Page setPage={setPage} toast={toast}/></main>
         <footer style={{borderTop:`2px solid ${P.border}`,marginTop:64,padding:"22px 24px",textAlign:"center",color:P.ink3,fontSize:12,fontWeight:600}}>
           <GT g={P.gHero} style={{fontFamily:"'Syne',sans-serif",fontWeight:900,fontSize:14}}>FINDME</GT>
-          {" "}· Campus Lost & Found · Smart Matching · FastAPI + MongoDB
+          {" "}· Campus Lost & Found · Smart Matching · FastAPI + MongoDB · <button onClick={()=>setPage("howto")} style={{background:"none",border:"none",color:P.ink3,cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,textDecoration:"underline"}}>📖 How to Use</button>
         </footer>
       </div>
       <Toast toasts={ts} remove={remove}/>
