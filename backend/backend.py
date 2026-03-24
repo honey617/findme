@@ -38,7 +38,7 @@ from email.mime.text import MIMEText
 from enum import Enum
 from functools import lru_cache
 from typing import Optional
-
+from dotenv import load_dotenv
 import numpy as np
 from bson import ObjectId
 from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
@@ -57,6 +57,8 @@ from sklearn.metrics.pairwise import cosine_similarity as sk_cosine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("findme")
 
+load_dotenv()
+
 # ─────────────────────────────────────────────────────────────────────────────
 # SETTINGS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -72,9 +74,9 @@ class Settings(BaseModel):
     MIN_MATCH_SCORE:        float = 35.0
     SMTP_HOST:                str = "smtp.gmail.com"
     SMTP_PORT:                int = 587
-    SMTP_USER:                str = "findmeproject109@gmail.com"
-    SMTP_PASSWORD:            str = "sbbq icnl ivwk iflj"
-    SMTP_FROM:                str = "FINDME <findmeproject109@gmail.com>"
+    SMTP_USER:                str = os.getenv("SMTP_USER")
+    SMTP_PASSWORD:            str = os.getenv("SMTP_PASSWORD")
+    SMTP_FROM:                str = os.getenv("SMTP_FROM")
     TWILIO_ACCOUNT_SID:       str = ""
     TWILIO_AUTH_TOKEN:        str = ""
     TWILIO_FROM_NUMBER:       str = ""
@@ -96,9 +98,9 @@ def cfg() -> Settings:
         MIN_MATCH_SCORE         = float(os.getenv("MIN_MATCH_SCORE",   "35.0")),
         SMTP_HOST               = os.getenv("SMTP_HOST",               "smtp.gmail.com"),
         SMTP_PORT               = int(os.getenv("SMTP_PORT",           "587")),
-        SMTP_USER               = os.getenv("SMTP_USER",               "findmeproject109@gmail.com"),
-        SMTP_PASSWORD           = os.getenv("SMTP_PASSWORD",           "sbbq icnl ivwk iflj"),
-        SMTP_FROM               = os.getenv("SMTP_FROM",               "FINDME <findmeproject109@gmail.com>"),
+        SMTP_USER               = os.getenv("SMTP_USER"),
+        SMTP_PASSWORD           = os.getenv("SMTP_PASSWORD"),
+        SMTP_FROM               = os.getenv("SMTP_FROM"),
         TWILIO_ACCOUNT_SID      = os.getenv("TWILIO_ACCOUNT_SID",      ""),
         TWILIO_AUTH_TOKEN       = os.getenv("TWILIO_AUTH_TOKEN",       ""),
         TWILIO_FROM_NUMBER      = os.getenv("TWILIO_FROM_NUMBER",      ""),
