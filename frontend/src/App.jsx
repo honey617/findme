@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef, createContext, useContext } f
 
 const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
+console.log(BASE);
+
 // ── API ───────────────────────────────────────────────────────────────────────
 const tok = () => localStorage.getItem("fm_token");
 const ah  = () => { const t = tok(); return t ? { Authorization: `Bearer ${t}` } : {}; };
