@@ -132,7 +132,7 @@ def hash_pw(pw: str)            -> str:  return pwd_ctx.hash(pw)
 def verify_pw(plain, hashed)    -> bool: return pwd_ctx.verify(plain, hashed)
 
 def make_token(user_id: str) -> str:
-    expire = now_ist() + timedelta(minutes=cfg().ACCESS_TOKEN_EXPIRE_MINS)
+    expire = now_utc() + timedelta(minutes=cfg().ACCESS_TOKEN_EXPIRE_MINS)
     return jwt.encode({"sub": user_id, "exp": expire}, cfg().SECRET_KEY, algorithm="HS256")
 
 async def current_user(token: str = Depends(oauth2)) -> dict:
