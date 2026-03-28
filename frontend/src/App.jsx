@@ -500,7 +500,7 @@ function BoardPage({setPage,toast}){
               <button onClick={()=>setSel(null)} style={{width:32,height:32,borderRadius:"50%",border:"none",background:P.border,color:P.ink2,fontSize:16,cursor:"pointer"}}>✕</button>
             </div>
             <SPill status={sel.status}/>
-            {sel.image_path&&<img src={`${BASE}/${sel.image_path}`} alt="" style={{width:"100%",maxHeight:230,objectFit:"cover",borderRadius:P.r,border:`2px solid ${P.border}`}}/>}
+            {sel.image_path&&<img src={sel.image_path} alt="" style={{width:"100%",maxHeight:230,objectFit:"cover",borderRadius:P.r,border:`2px solid ${P.border}`}}/>}
             {sel.description&&<p style={{fontSize:14,color:P.ink2,lineHeight:1.7,background:P.panel,padding:"12px 15px",borderRadius:P.r}}>{sel.description}</p>}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
               {sel.location&&<IBox lbl="📍 Location" val={sel.location} col={P.cyan}/>}
@@ -550,7 +550,7 @@ function ICard({item,i,onClick}){
       style={{background:hov?acc.tint:P.card,border:`2px solid ${hov?acc.glow+"66":P.border}`,borderRadius:20,overflow:"hidden",cursor:"pointer",boxShadow:hov?`0 16px 48px ${acc.glow}30`:P.sh,transform:hov?"translateY(-5px) scale(1.015)":"none",transition:"all .22s",animation:"fadeUp .45s ease",animationDelay:`${i*.05}s`,animationFillMode:"both"}}>
       <div style={{height:5,background:acc.bar}}/>
       <div style={{height:136,background:acc.tint,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",position:"relative"}}>
-        {item.image_path&&<img src={`${BASE}/${item.image_path}`} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover",position:"absolute",inset:0}} onError={e=>e.target.style.display="none"}/>}
+        {item.image_path&&<img src={item.image_path} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover",position:"absolute",inset:0}} onError={e=>e.target.style.display="none"}/>}
         <span style={{fontSize:50,filter:"drop-shadow(0 4px 10px rgba(0,0,0,.4))"}}>{CAT_ICONS[item.category]||"📦"}</span>
         <div style={{position:"absolute",top:9,right:9}}><SPill status={item.status}/></div>
       </div>
