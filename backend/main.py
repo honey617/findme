@@ -54,8 +54,12 @@ logger = logging.getLogger("findme")
 IST = timezone(timedelta(hours=5, minutes=30))
 
 def now_utc() -> datetime:
-    """Return current datetime in Indian Standard Time (UTC+5:30)."""
+    """Return current datetime in UTC."""
     return datetime.now(timezone.utc)
+
+def now_ist() -> datetime:
+    """Return current datetime in Indian Standard Time (UTC+5:30)."""
+    return datetime.now(IST)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SETTINGS
@@ -396,12 +400,10 @@ def ser(doc: dict) -> dict:
     doc.pop("image_embedding", None)
     for k, v in list(doc.items()):
         if isinstance(v, datetime):
-            # Always send as UTC ISO string; frontend converts to IST for display
             if v.tzinfo is None:
                 v = v.replace(tzinfo=timezone.utc)
-            else:
-                v = v.astimezone(timezone.utc)
-            doc[k] = v.isoformat().replace("+00:00", "Z")
+            v = v.astimezone(IST)
+            doc[k] = v.isoformat()
     return doc
 
 # ─────────────────────────────────────────────────────────────────────────────
