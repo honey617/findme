@@ -7,7 +7,8 @@ No external AI APIs. Runs fully locally.
 Usage:
     pip install fastapi uvicorn[standard] motor pymongo pydantic[email] \
                 python-jose[cryptography] passlib[bcrypt] python-multipart \
-                pillow numpy scikit-learn torch torchvision python-dotenv aiofiles
+                pillow numpy scikit-learn torch torchvision python-dotenv aiofiles \
+                cloudinary
     uvicorn backend:app --reload --port 8000
 
 Environment variables (create a .env file):
@@ -26,6 +27,8 @@ Environment variables (create a .env file):
 # IMPORTS
 # ─────────────────────────────────────────────────────────────────────────────
 import os, io, uuid, json, logging, re
+import cloudinary
+import cloudinary.uploader
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -98,9 +101,9 @@ def cfg() -> Settings:
         BREVO_API_KEY           = os.getenv("BREVO_API_KEY",           ""),
         BREVO_FROM_EMAIL        = os.getenv("BREVO_FROM_EMAIL",        "noreply@yourdomain.com"),
         BREVO_FROM_NAME         = os.getenv("BREVO_FROM_NAME",         "FINDME"),
-        CLOUDINARY_CLOUD_NAME   =os.getenv("CLOUDINARY_CLOUD_NAME"),
-        CLOUDINARY_API_KEY      =os.getenv("CLOUDINARY_API_KEY"),
-        CLOUDINARY_API_SECRET   =os.getenv("CLOUDINARY_API_SECRET"),
+        CLOUDINARY_CLOUD_NAME   =os.getenv("CLOUDINARY_CLOUD_NAME",   ""),
+        CLOUDINARY_API_KEY      =os.getenv("CLOUDINARY_API_KEY",      ""),
+        CLOUDINARY_API_SECRET   =os.getenv("CLOUDINARY_API_SECRET",   ""),
 
     )
 
@@ -386,9 +389,10 @@ async def save_upload(file: UploadFile) -> tuple[str, bytes]:
     cloudinary.config(
         cloud_name=cfg().CLOUDINARY_CLOUD_NAME,
         api_key=cfg().CLOUDINARY_API_KEY,
+        api_secret=cfg().CLOUDINARY_API_SECRET,
         secure=True,
     )
-    result=cloudinary.uploader.upload(io.BytesIO(data),floder="findme",resource_type="image")
+    result=cloudinary.uploader.upload(io.BytesIO(data),folder="findme",resource_type="image")
     return result["secure_url"],data
 
 # ─────────────────────────────────────────────────────────────────────────────

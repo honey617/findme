@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const BASE = "http://localhost:8000";
 
 // ── API ───────────────────────────────────────────────────────────────────────
 const tok = () => localStorage.getItem("fm_token");
