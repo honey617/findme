@@ -53,9 +53,9 @@ logger = logging.getLogger("findme")
 # IST = UTC+5:30
 IST = timezone(timedelta(hours=5, minutes=30))
 
-def now_ist() -> datetime:
+def now_utc() -> datetime:
     """Return current datetime in Indian Standard Time (UTC+5:30)."""
-    return datetime.now(IST)
+    return datetime.now(timezone.utc)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SETTINGS
@@ -457,7 +457,7 @@ async def register(body: dict):
         "student_id":      body.get("student_id"),
         "is_active":       True,
         "items_returned":  0,
-        "created_at":      now_ist(),
+        "created_at":      now_utc(),
     }
     res = await col_users().insert_one(doc)
     doc["_id"] = str(res.inserted_id)
@@ -518,8 +518,8 @@ async def create_item(
         "location":        location,
         "image_path":      image_path,
         "image_embedding": embedding,
-        "created_at":      now_ist(),
-        "updated_at":      now_ist(),
+        "created_at":      now_utc(),
+        "updated_at":      now_utc(),
     }
     res = await col_items().insert_one(doc)
     doc["_id"] = res.inserted_id
@@ -540,7 +540,7 @@ async def _auto_match_found(found_doc: dict):
     if not best: return
 
     matched_lost = best.pop("found_item")   # find_best_match returns the candidate as "found_item"
-    now = now_ist()
+    now = now_utc()
 
     match_doc = {
         "lost_item_id":  str(matched_lost["_id"]),
@@ -851,7 +851,7 @@ async def send_message(match_id: str, body: dict, u: dict = Depends(current_user
         "sender_id":  uid,
         "sender_name": u.get("full_name", "User"),
         "text":       text,
-        "created_at": now_ist(),
+        "created_at": now_utc(),
     }
     res = await col_chat().insert_one(msg)
     msg["_id"] = str(res.inserted_id)
@@ -881,7 +881,7 @@ async def post_experience(body: dict, u: dict = Depends(current_user)):
         "author_id":   str(u["_id"]),
         "text":        text,
         "emoji":       emoji,
-        "created_at":  now_ist(),
+        "created_at":  now_utc(),
     }
     res = await col_experiences().insert_one(doc)
     doc["_id"] = str(res.inserted_id)
@@ -934,7 +934,7 @@ async def forgot_password(body: dict):
     if not user:
         return {"message": "If that email exists, a reset code has been sent."}
     otp = _gen_otp()
-    expires = now_ist() + timedelta(minutes=15)
+    expires = now_utc() + timedelta(minutes=15)
     await col_otp().replace_one(
         {"email": email},
         {"email": email, "otp": hash_pw(otp), "expires_at": expires},
