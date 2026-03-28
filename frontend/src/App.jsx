@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 
-const BASE = import.meta.env.VITE_API_BASE_URL;
+const BASE = "http://localhost:8000";
 
 // ── API ───────────────────────────────────────────────────────────────────────
 const tok = () => localStorage.getItem("fm_token");
@@ -87,11 +87,12 @@ const CARD_ACC=[
 const TAG_COLORS=["#a78bfa","#22d3ee","#a3e635","#f472b6","#fbbf24","#fb7185"];
 
 // ── IST DATE/TIME HELPERS ──────────────────────────────────────────────────────
-const toIST = (d) => new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
-const fmtDate = (d) => toIST(d).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" });
-const fmtDateShort = (d) => toIST(d).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
-const fmtTime = (d) => toIST(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
-const fmtDateTime = (d) => toIST(d).toLocaleString("en-IN", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+// Backend now sends ISO strings with +05:30 offset — new Date() parses them correctly
+const IST_LOCALE = { timeZone: "Asia/Kolkata" };
+const fmtDate      = (d) => new Date(d).toLocaleDateString("en-IN",  { ...IST_LOCALE, month:"short", day:"numeric", year:"numeric" });
+const fmtDateShort = (d) => new Date(d).toLocaleDateString("en-IN",  { ...IST_LOCALE, month:"short", day:"numeric" });
+const fmtTime      = (d) => new Date(d).toLocaleTimeString("en-IN",  { ...IST_LOCALE, hour:"2-digit", minute:"2-digit" });
+const fmtDateTime  = (d) => new Date(d).toLocaleString("en-IN",      { ...IST_LOCALE, month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" });
 const CAT_ICONS={Electronics:"💻",Clothing:"👕",Accessories:"👜",Keys:"🔑",Bags:"🎒",Books:"📚",Sports:"⚽",Stationery:"✏️",Other:"📦"};
 const CATS=["Electronics","Clothing","Accessories","Keys","Bags","Books","Sports","Stationery","Other"];
 const RANK_ICONS=["🥇","🥈","🥉"];
