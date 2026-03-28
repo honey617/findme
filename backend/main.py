@@ -38,7 +38,7 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, sta
 # Note: Form is still used in create_item for multipart file uploads
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.staticfiles import StaticFiles
+#from fastapi.staticfiles import StaticFiles
 from jose import JWTError, jwt
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
@@ -73,6 +73,9 @@ class Settings(BaseModel):
     BREVO_API_KEY:            str = ""
     BREVO_FROM_EMAIL:         str = "noreply@yourdomain.com"
     BREVO_FROM_NAME:          str = "FINDME"
+    CLOUDINARY_CLOUD_NAME:     str=""
+    CLOUDINARY_API_KEY:        str=""
+    CLOUDINARY_API_SECRET:     str=""
 
 @lru_cache
 def cfg() -> Settings:
@@ -91,6 +94,10 @@ def cfg() -> Settings:
         BREVO_API_KEY           = os.getenv("BREVO_API_KEY",           ""),
         BREVO_FROM_EMAIL        = os.getenv("BREVO_FROM_EMAIL",        "noreply@yourdomain.com"),
         BREVO_FROM_NAME         = os.getenv("BREVO_FROM_NAME",         "FINDME"),
+        CLOUDINARY_CLOUD_NAME   =os.getenv("CLOUDINARY_CLOUD_NAME"),
+        CLOUDINARY_API_KEY      =os.getenv("CLOUDINARY_API_KEY"),
+        CLOUDINARY_API_SECRET   =os.getenv("CLOUDINARY_API_SECRET"),
+
     )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -372,11 +379,13 @@ async def save_upload(file: UploadFile) -> tuple[str, bytes]:
         raise HTTPException(400, f"File too large (max {cfg().MAX_FILE_MB} MB)")
     if file.content_type not in ALLOWED:
         raise HTTPException(400, f"Unsupported file type: {file.content_type}")
-    os.makedirs(cfg().UPLOAD_DIR, exist_ok=True)
-    ext  = (file.filename or "img").rsplit(".", 1)[-1]
-    path = os.path.join(cfg().UPLOAD_DIR, f"{uuid.uuid4().hex}.{ext}")
-    with open(path, "wb") as f: f.write(data)
-    return path, data
+    cloudinary.config(
+        cloud_name=cfg().CLOUDINARY_CLOUD_NAME,
+        api_key=cfg().CLOUDINARY_API_KEY,
+        secure=True,
+    )
+    result=cloudinary.uploader.upload(io.BytesIO(data),floder="findme",resource_type="image")
+    return result["secure_url"],data
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SERIALISE MongoDB docs  (convert _id ObjectId → str, hide embedding)
@@ -400,7 +409,6 @@ def ser(doc: dict) -> dict:
 # ─────────────────────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    os.makedirs(cfg().UPLOAD_DIR, exist_ok=True)
     await create_indexes()
     try: load_cnn()          # warm up CNN on startup
     except Exception: pass
@@ -418,8 +426,6 @@ app = FastAPI(
 app.add_middleware(CORSMiddleware, allow_origins=["https://findme-sage.vercel.app"],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HEALTH
