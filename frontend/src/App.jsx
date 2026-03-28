@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 
-const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-
-console.log(BASE);
+const BASE = "http://localhost:8000";
 
 // ── API ───────────────────────────────────────────────────────────────────────
 const tok = () => localStorage.getItem("fm_token");
@@ -87,6 +85,13 @@ const CARD_ACC=[
   {bar:"linear-gradient(135deg,#fb7185,#f472b6)",glow:"#fb7185",tint:"#fb718510"},
 ];
 const TAG_COLORS=["#a78bfa","#22d3ee","#a3e635","#f472b6","#fbbf24","#fb7185"];
+
+// ── IST DATE/TIME HELPERS ──────────────────────────────────────────────────────
+const toIST = (d) => new Date(new Date(d).toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+const fmtDate = (d) => toIST(d).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" });
+const fmtDateShort = (d) => toIST(d).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+const fmtTime = (d) => toIST(d).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+const fmtDateTime = (d) => toIST(d).toLocaleString("en-IN", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
 const CAT_ICONS={Electronics:"💻",Clothing:"👕",Accessories:"👜",Keys:"🔑",Bags:"🎒",Books:"📚",Sports:"⚽",Stationery:"✏️",Other:"📦"};
 const CATS=["Electronics","Clothing","Accessories","Keys","Bags","Books","Sports","Stationery","Other"];
 const RANK_ICONS=["🥇","🥈","🥉"];
@@ -335,7 +340,7 @@ function ChatWidget({matchId,currentUserId,onClose}){
               <div style={{background:mine?P.gMain:P.card,color:"#fff",padding:"9px 13px",borderRadius:mine?"16px 16px 4px 16px":"16px 16px 16px 4px",maxWidth:"82%",fontSize:13,lineHeight:1.55,boxShadow:P.sh}}>
                 {m.text}
               </div>
-              <div style={{fontSize:9,color:P.ink3,marginTop:3}}>{new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>
+              <div style={{fontSize:9,color:P.ink3,marginTop:3}}>{fmtTime(m.created_at)}</div>
             </div>
           );
         })}
@@ -444,7 +449,7 @@ function Hero({setPage,user,count}){
           <Btn g="rgba(255,255,255,.18)" col="#fff" sz="lg" onClick={()=>setPage("leaderboard")} sx={{border:"2px solid rgba(255,255,255,.4)"}}>🏆 Leaderboard</Btn>
         </div>
         <div style={{display:"flex",gap:10,marginTop:26,flexWrap:"wrap"}}>
-          {[["🧠","Smart Matching"],["🔔","Email + SMS"],["🏆","Leaderboard"],["💬","In-App Chat"],["✨","Stories"]].map(([ic,lb])=>(
+          {[["🧠","Smart Matching"],["🔔","Email Alerts"],["🏆","Leaderboard"],["💬","In-App Chat"],["✨","Stories"]].map(([ic,lb])=>(
             <div key={lb} style={{display:"flex",alignItems:"center",gap:5,background:"rgba(255,255,255,.15)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 13px",fontSize:11,fontWeight:700}}>{ic} {lb}</div>
           ))}
         </div>
@@ -521,7 +526,7 @@ function BoardPage({setPage,toast}){
                       <MRow r={r} onChat={()=>setChatMatchId(chatMatchId===r.match_id?null:r.match_id)} chatOpen={chatMatchId===r.match_id}/>
                       {chatMatchId===r.match_id&&user&&r.match_id&&(
                         <div style={{marginBottom:12,marginTop:-4,borderRadius:"0 0 14px 14px",overflow:"hidden",border:`2px solid ${P.violet}44`,borderTop:"none"}}>
-                          <InlineChatPanel matchId={r.match_id} currentUserId={String(user._id)}/>
+                          <InlineChatPanel matchId={r.match_id} currentUserId={String(user._id||user.id)}/>
                         </div>
                       )}
                     </div>
@@ -552,7 +557,7 @@ function ICard({item,i,onClick}){
         <div style={{fontWeight:900,fontSize:14.5,marginBottom:5,fontFamily:"'Syne',sans-serif",color:P.ink,lineHeight:1.2}}>{item.name}</div>
         {item.location&&<div style={{fontSize:11,color:P.ink3,marginBottom:7,fontWeight:700}}>📍 {item.location}</div>}
         {item.tags?.length>0&&<div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:7}}>{item.tags.slice(0,3).map((t,ti)=><Chip key={t} color={TAG_COLORS[ti%TAG_COLORS.length]}>{t}</Chip>)}{item.tags.length>3&&<Chip color={P.ink3}>+{item.tags.length-3}</Chip>}</div>}
-        <div style={{fontSize:10,color:P.ink3,paddingTop:8,borderTop:`1.5px solid ${P.border}`,fontWeight:700}}>{new Date(item.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
+        <div style={{fontSize:10,color:P.ink3,paddingTop:8,borderTop:`1.5px solid ${P.border}`,fontWeight:700}}>{fmtDate(item.created_at)}</div>
       </div>
     </div>
   );
@@ -613,7 +618,7 @@ function InlineChatPanel({matchId, currentUserId}){
               <div style={{background:mine?P.gMain:P.card,color:"#fff",padding:"8px 12px",borderRadius:mine?"14px 14px 4px 14px":"14px 14px 14px 4px",maxWidth:"80%",fontSize:12,lineHeight:1.5}}>
                 {m.text}
               </div>
-              <div style={{fontSize:9,color:P.ink3,marginTop:2}}>{new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>
+              <div style={{fontSize:9,color:P.ink3,marginTop:2}}>{fmtTime(m.created_at)}</div>
             </div>
           );
         })}
@@ -880,7 +885,7 @@ function MatchesPage({toast}){
       {/* Info banner for finder tab */}
       {tab==="finder"&&finderMatches.length>0&&(
         <div style={{background:P.cyan+"12",border:`2px solid ${P.cyan}44`,borderRadius:P.r,padding:"12px 16px",marginBottom:18,fontSize:13,color:P.cyan,fontWeight:600,lineHeight:1.65}}>
-          📢 The item owner has been notified by email & SMS. Use the chat below to coordinate pickup!
+          📢 The item owner has been notified by email. Use the chat below to coordinate pickup!
         </div>
       )}
 
@@ -961,7 +966,7 @@ function MatchesPage({toast}){
         </div>
       }
       <OutcomeModal open={!!outcomeMatch} onClose={()=>setOutcomeMatch(null)} onSubmit={submitOutcome} match={outcomeMatch} loading={submitting}/>
-      {chatMatchId&&user&&<ChatWidget matchId={chatMatchId} currentUserId={String(user._id)} onClose={()=>setChatMatchId(null)}/>}
+      {chatMatchId&&user&&<ChatWidget matchId={chatMatchId} currentUserId={String(user._id||user.id)} onClose={()=>setChatMatchId(null)}/>}
     </div>
   );
 }
@@ -1054,8 +1059,8 @@ function ExperiencesPage({toast}){
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,flexWrap:"wrap",gap:6}}>
                     <GT g={P.gMain} style={{fontWeight:800,fontSize:14}}>{s.author_name}</GT>
                     <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                      <span style={{fontSize:11,color:P.ink3,fontWeight:600}}>{new Date(s.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</span>
-                      {user&&s.author_id===String(user._id)&&(
+                      <span style={{fontSize:11,color:P.ink3,fontWeight:600}}>{fmtDateShort(s.created_at)}</span>
+                      {user&&s.author_id===String(user._id||user.id)&&(
                         <button onClick={()=>del(s._id)} style={{background:"none",border:"none",color:P.coral,fontSize:12,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>✕</button>
                       )}
                     </div>
@@ -1097,7 +1102,7 @@ function MyItemsPage({setPage,toast}){
                 </div>
                 {item.location&&<div style={{fontSize:11,color:P.ink3,fontWeight:700}}>📍 {item.location}</div>}
                 {item.tags?.length>0&&<div style={{display:"flex",flexWrap:"wrap",gap:4}}>{item.tags.slice(0,3).map((t,ti)=><Chip key={t} color={TAG_COLORS[ti%TAG_COLORS.length]}>{t}</Chip>)}</div>}
-                <div style={{fontSize:10,color:P.ink3,fontWeight:700}}>{new Date(item.created_at).toLocaleDateString()}</div>
+                <div style={{fontSize:10,color:P.ink3,fontWeight:700}}>{fmtDate(item.created_at)}</div>
                 <div style={{display:"flex",gap:7,paddingTop:4}}>
                   <Btn g={P.gCyan} sz="sm" onClick={()=>setEdit(item)}>✏️ Edit</Btn>
                   <Btn g={P.gCoral} sz="sm" loading={del===item._id} onClick={()=>doDelete(item._id)}>🗑️</Btn>
@@ -1159,7 +1164,7 @@ function NotifsPage({toast}){
                     <span style={{fontWeight:800,fontSize:13,color:P.ink}}>{n.subject||"Notification"}</span>
                     <div style={{display:"flex",gap:5}}><Chip color={sc}>{n.status}</Chip><Chip color={P.violet}>{n.type}</Chip></div>
                   </div>
-                  <div style={{fontSize:11,color:P.ink3,fontWeight:600}}>{n.recipient} · {new Date(n.created_at).toLocaleString()}</div>
+                  <div style={{fontSize:11,color:P.ink3,fontWeight:600}}>{n.recipient} · {fmtDateTime(n.created_at)}</div>
                   {n.status==="failed"&&n.error_message&&<div style={{fontSize:11,color:P.coral,marginTop:3,fontWeight:700}}>⚠️ {n.error_message}</div>}
                 </div>
               </div>
@@ -1202,7 +1207,7 @@ function HowToUsePage({setPage}){
         {n:"4",icon:"👁️",title:"Review & Confirm",desc:'Click "Review & Confirm". A preview card shows everything you entered. Check the details carefully. Click "Confirm & Post" when satisfied.',tip:"Double check the location — it helps matching a lot."},
         {n:"5",icon:"🔗",title:"Run Find Matches",desc:'Open your item from the Browse page, then click "Find Matches". The system compares your item against all found items and shows results with a match percentage.',tip:"Results as low as 20% are shown. Even a 30% match is worth checking via chat."},
         {n:"6",icon:"💬",title:"Chat with the Finder",desc:"Each match result shows a 💬 Chat button. Click it to open an inline chat. Introduce yourself and describe a unique detail only you would know to verify it is yours.",tip:"Ask the finder about a specific scratch, sticker, or code on the item."},
-        {n:"7",icon:"🔔",title:"Wait for Auto Notifications",desc:"Even without a match now, your listing stays active. When someone posts a new found item matching yours, you get instant email and SMS automatically.",tip:"Keep the item posted — new found items are added every day."},
+        {n:"7",icon:"🔔",title:"Wait for Auto Notifications",desc:"Even without a match now, your listing stays active. When someone posts a new found item matching yours, you get an instant email automatically.",tip:"Keep the item posted — new found items are added every day."},
         {n:"8",icon:"✅",title:"Confirm the Outcome",desc:'Once you have your item back, go to "🔗 Matches" → "Update Outcome" → "🎉 Yes! Got it back". This marks it claimed and gives the finder leaderboard credit.',tip:"Always close matches after resolution — it keeps the board accurate."},
       ],
     },
@@ -1213,7 +1218,7 @@ function HowToUsePage({setPage}){
         {n:"1",icon:"🚀",title:"Create Your Account",desc:"Click Join Free. Sign up with name, email, password and phone. Your contact is shared with the item owner when a match is confirmed so they can reach you for pickup.",tip:"A complete profile builds trust with the person who lost their item."},
         {n:"2",icon:"📋",title:"Post the Found Item",desc:'Click "📤 Post" → select "📦 I Found Something". Enter the item name, category, and exact location where you found it. Be as specific as possible with tags.',tip:"'Library 2nd floor near the printer' is better than just 'Library'."},
         {n:"3",icon:"📷",title:"Take a Clear Photo",desc:"Photograph the found item and upload it. This is the most powerful part — the system visually compares your photo against all posted lost item photos on campus.",tip:"Good lighting and a plain background makes visual matching more accurate."},
-        {n:"4",icon:"⚡",title:"Matching Runs Automatically",desc:"The moment you post, the system scans all active lost items and compares them. If a strong match is found, the owner gets an email and SMS immediately — no action needed from you.",tip:"This runs in the background automatically after every post."},
+        {n:"4",icon:"⚡",title:"Matching Runs Automatically",desc:"The moment you post, the system scans all active lost items and compares them. If a strong match is found, the owner gets an email immediately — no action needed from you.",tip:"This runs in the background automatically after every post."},
         {n:"5",icon:"🔗",title:"Check Your Matches Tab",desc:'Go to "🔗 Matches" → click the "📦 I Found Something" tab. See all matches for your found items. Each card shows the matched lost item and the owner contact details.',tip:"Check this tab a few minutes after posting — you may already have a match."},
         {n:"6",icon:"💬",title:"Chat with the Owner",desc:"Click 💬 Chat on any match to message the lost item owner. Let them know your availability. Ask them to describe a unique detail to verify the item is truly theirs.",tip:"Ask for something not visible in any photo — a code, inscription, or specific damage."},
         {n:"7",icon:"🏆",title:"Earn Leaderboard Credit",desc:"Once the owner confirms receipt, your leaderboard score goes up by 1. Top returners get gold, silver, and bronze badges displayed publicly on campus.",tip:"The more items you return, the higher your campus reputation!"},
@@ -1222,7 +1227,7 @@ function HowToUsePage({setPage}){
   ];
 
   const faqs=[
-    {q:"What if no match is found right now?",a:"Your item stays active. Whenever a new found item is posted that matches yours, you automatically get email and SMS. Check back daily — new items are added regularly."},
+    {q:"What if no match is found right now?",a:"Your item stays active. Whenever a new found item is posted that matches yours, you automatically get an email. Check back daily — new items are added regularly."},
     {q:"Is my phone number visible to everyone?",a:"No. Your phone is only shared with the specific matched person after a match is confirmed. The general public cannot see it at all."},
     {q:"What if the match percentage is low, like 25%?",a:"Still worth checking! A 25% match could still be your item — especially if the finder did not add a photo or good description. Use chat to ask them directly."},
     {q:"Can I post multiple lost items?",a:"Yes! Post as many as you need. All items appear in 📋 My Items where you can edit, update or delete them anytime."},
@@ -1297,7 +1302,7 @@ function HowToUsePage({setPage}){
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(195px,1fr))",gap:12}}>
           {[
             {icon:"🧠",title:"Smart Matching",desc:"Visual photo + text analysis automatically finds the best matches",color:P.violet},
-            {icon:"🔔",title:"Auto Notifications",desc:"Instant email & SMS when a match is found for your item",color:P.cyan},
+            {icon:"🔔",title:"Auto Notifications",desc:"Instant email when a match is found for your item",color:P.cyan},
             {icon:"💬",title:"In-App Chat",desc:"Message finder or owner directly within the platform",color:P.pink},
             {icon:"🏆",title:"Leaderboard",desc:"Top item returners earn public recognition on campus",color:P.amber},
             {icon:"✨",title:"Stories Wall",desc:"Share your experience and inspire other students",color:P.lime},
