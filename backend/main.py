@@ -340,7 +340,7 @@ def _email_html(user: dict, lost: dict, found: dict, match: dict, finder: dict =
   </div>
   <div style="background:linear-gradient(135deg,#22d3ee22,#a78bfa22);border:2px solid #22d3ee44;border-radius:12px;padding:18px;margin-bottom:20px;text-align:center">
     <p style="margin:0 0 14px;font-size:15px;color:#f0eeff">🎉 Contact the finder directly using the details above,<br/>or log in to confirm the match on the platform.</p>
-    <a href="https://findme-sage.vercel.app" style="display:inline-block;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:800;font-size:14px">Open FINDME Platform →</a>
+    <a href="http://localhost:5173" style="display:inline-block;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:800;font-size:14px">Open FINDME Platform →</a>
   </div>
   <p style="color:#6b6890;font-size:11px;text-align:center;margin:0">FINDME Campus Lost &amp; Found · Powered by CNN + TF-IDF Matching</p>
 </body></html>"""
@@ -415,7 +415,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["https://findme-sage.vercel.app"],
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 os.makedirs("uploads", exist_ok=True)
@@ -959,7 +959,11 @@ async def reset_password(body: dict):
     record = await col_otp().find_one({"email": email})
     if not record or not verify_pw(otp, record["otp"]):
         raise HTTPException(400, "Invalid or expired reset code")
-    if record["expires_at"] < now_ist():
+    # Motor returns datetime as UTC-aware; convert both sides to UTC for safe comparison
+    expires = record["expires_at"]
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires < datetime.now(timezone.utc):
         raise HTTPException(400, "Reset code has expired")
     await col_users().update_one({"email": email}, {"$set": {"hashed_password": hash_pw(new_pw)}})
     await col_otp().delete_one({"email": email})
