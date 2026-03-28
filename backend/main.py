@@ -340,7 +340,7 @@ def _email_html(user: dict, lost: dict, found: dict, match: dict, finder: dict =
   </div>
   <div style="background:linear-gradient(135deg,#22d3ee22,#a78bfa22);border:2px solid #22d3ee44;border-radius:12px;padding:18px;margin-bottom:20px;text-align:center">
     <p style="margin:0 0 14px;font-size:15px;color:#f0eeff">🎉 Contact the finder directly using the details above,<br/>or log in to confirm the match on the platform.</p>
-    <a href="http://localhost:5173" style="display:inline-block;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:800;font-size:14px">Open FINDME Platform →</a>
+    <a href="https://findme-sage.vercel.app" style="display:inline-block;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:800;font-size:14px">Open FINDME Platform →</a>
   </div>
   <p style="color:#6b6890;font-size:11px;text-align:center;margin:0">FINDME Campus Lost &amp; Found · Powered by CNN + TF-IDF Matching</p>
 </body></html>"""
@@ -415,7 +415,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"],
+app.add_middleware(CORSMiddleware, allow_origins=["https://findme-sage.vercel.app"],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 os.makedirs("uploads", exist_ok=True)
